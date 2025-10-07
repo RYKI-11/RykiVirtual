@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ryki Virtual </title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Barra lateral -->
+    <aside class="sidebar">
+      <h2> Ryki Virtual</h2>
+      <p>Selecciona un modo:</p>
+      <select id="mode-selector">
+        <option value="general">General</option>
+        <option value="primaria">Primaria</option>
+        <option value="secundaria">Secundaria</option>
+        <option value="informatica">Informática</option>
+      </select>
+      <div class="info">
+        <p><b>Consejo:</b> Escribe tu mensaje y pulsa Enter o el botón <b>Enviar</b>.</p>
+      </div>
+    </aside>
+
+    <!-- Zona del chat -->
+    <main class="chat-container">
+      <div id="chat-box" class="chat-box"></div>
+      <div class="input-container">
+        <input id="user-input" type="text" placeholder="Escribe aquí...">
+        <button id="send-btn">Enviar</button>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
