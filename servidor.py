@@ -1,145 +1,91 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+import random
 import wikipedia
 from duckduckgo_search import DDGS
-import json
 import os
-import datetime
 
-# --- CONFIGURACIÓN ---
-wikipedia.set_lang("es")
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# --- Configuración de Wikipedia ---
+wikipedia.set_lang("es")
 
-# --- CLASE PARA LOS MENSAJES ---
-class Message(BaseModel):
-    message: str
-    mode: str
+# --- Montar archivos estáticos (CSS y JS) ---
+app.mount("/static", StaticFiles(directory="."), name="static")
 
-# --- ARCHIVOS DE MEMORIA ---
-MEMORIA_FILE = "memoria.json"
-INFO_FILE = "info_memoria.json"
-
-# --- FUNCIONES DE MEMORIA ---
-def borrar_memoria():
-    """Borra la memoria completamente"""
-    with open(MEMORIA_FILE, "w", encoding="utf-8") as f:
-        json.dump([], f)
-    with open(INFO_FILE, "w", encoding="utf-8") as f:
-        json.dump({"ultima_limpieza": str(datetime.date.today())}, f)
-
-def cargar_memoria():
-    """Carga la memoria y la fecha de última limpieza"""
-    if not os.path.exists(MEMORIA_FILE):
-        borrar_memoria()
-
-    with open(MEMORIA_FILE, "r", encoding="utf-8") as f:
-        memoria = json.load(f)
-
-    if os.path.exists(INFO_FILE):
-        with open(INFO_FILE, "r", encoding="utf-8") as f:
-            info = json.load(f)
-    else:
-        info = {"ultima_limpieza": str(datetime.date.today())}
-        with open(INFO_FILE, "w", encoding="utf-8") as f:
-            json.dump(info, f)
-
-    return memoria, info
-
-def guardar_memoria(memoria):
-    """Guarda la memoria actual"""
-    with open(MEMORIA_FILE, "w", encoding="utf-8") as f:
-        json.dump(memoria, f, ensure_ascii=False, indent=2)
-
-# --- CARGAR MEMORIA INICIAL ---
-memoria, info = cargar_memoria()
-
-# --- BORRAR SI PASÓ UN DÍA ---
-hoy = datetime.date.today()
-ultima = datetime.date.fromisoformat(info["ultima_limpieza"])
-if hoy > ultima:
-    borrar_memoria()
-    memoria, info = cargar_memoria()
-    print("🧹 Memoria limpiada automáticamente (nuevo día).")
-
-# --- FUNCIONES DE BÚSQUEDA ---
-def buscar_wikipedia(pregunta):
-    try:
-        resultados = wikipedia.search(pregunta, results=1)
-        if resultados:
-            return wikipedia.summary(resultados[0], sentences=2)
-        return ""
-    except:
-        return ""
-
-def buscar_duckduckgo(pregunta):
-    try:
-        with DDGS() as ddgs:
-            resultados = list(ddgs.text(pregunta, max_results=1))
-            if resultados:
-                return resultados[0]["body"]
-        return ""
-    except:
-        return ""
-
-# --- FUNCIONES DE MEMORIA ---
-def recordar(texto):
-    """Añade texto a la memoria global"""
-    memoria.append(texto)
-    guardar_memoria(memoria)
-
-def obtener_tema_anterior():
-    """Devuelve el último tema mencionado"""
-    for frase in reversed(memoria):
-        if frase.startswith("Usuario: "):
-            return frase.replace("Usuario: ", "")
-    return None
-
-# --- RESPUESTAS BÁSICAS ---
-respuestas = {
-    "hola": "¡Hola! Soy Ryki , tu asistente virtual .",
-    "como estas": "Estoy muy bien, ¡gracias por preguntar! ",
-    "adios": "¡Hasta pronto! ",
-    "quien eres": "Soy Ryki Virtual, un asistente que aprende de todos .",
+# --- Datos básicos del asistente ---
+respuestas_basicas = {
+    "hola": "¡Hola! Soy Ryki Virtual 😊 ¿en qué puedo ayudarte hoy?",
+    "como estas": "Estoy muy bien, ¡gracias por preguntar! ¿y tú?",
+    "quien eres": "Soy Ryki Virtual, tu asistente inteligente creado por ti 😎",
+    "adios": "¡Hasta luego! Espero verte pronto 👋",
+    "que puedes hacer": "Puedo responderte cosas básicas, ayudarte con preguntas de primaria y secundaria, y buscar información en Internet 🔍",
 }
 
-# --- ENDPOINT PRINCIPAL ---
+# --- Preguntas educativas ---
+respuestas_educativas = {
+    "que es una fraccion": "Una fracción representa una parte de un todo. Por ejemplo, 1/2 es la mitad de algo.",
+    "que es un verbo": "Un verbo es una palabra que indica acción, estado o proceso, como 'correr' o 'ser'.",
+    "que es la fotosintesis": "La fotosíntesis es el proceso mediante el cual las plantas convierten la luz solar en energía.",
+    "quien descubrio america": "Cristóbal Colón descubrió América en 1492.",
+    "que es un circuito electrico": "Un circuito eléctrico es un conjunto de elementos conectados que permiten el paso de corriente eléctrica.",
+    "que es el abecedario": "El abecedario es el conjunto de letras que usamos para escribir. En español tiene 27 letras.",
+    "que es la informatica": "La informática es la ciencia que estudia el tratamiento automático de la información mediante computadoras.",
+    "que es el hardware": "El hardware son las partes físicas de un ordenador, como la pantalla, el teclado o el procesador.",
+    "que es el software": "El software son los programas y sistemas que hacen funcionar al hardware, como Windows o una app.",
+}
+
+# --- Memoria temporal (recordar conversación) ---
+memoria_conversacion = []
+
+
+# --- Función para buscar en Internet ---
+def buscar_internet(pregunta: str) -> str:
+    try:
+        # Intentar buscar en Wikipedia
+        resultado = wikipedia.summary(pregunta, sentences=2)
+        return f"Según Wikipedia: {resultado}"
+    except Exception:
+        # Si no encuentra en Wikipedia, buscar en DuckDuckGo
+        try:
+            with DDGS() as ddgs:
+                resultados = list(ddgs.text(pregunta, region="es-es", max_results=1))
+                if resultados:
+                    return resultados[0]["body"]
+        except Exception:
+            pass
+    return "No encontré una respuesta clara en Internet 😕"
+
+
+# --- Endpoint del chat ---
 @app.post("/chat")
-def chat(msg: Message):
-    texto = msg.message.lower().strip()
-    recordar(f"Usuario: {texto}")
+async def chat(request: Request):
+    datos = await request.json()
+    pregunta = datos.get("mensaje", "").lower().strip()
 
-    # --- Respuestas directas ---
-    for clave, resp in respuestas.items():
-        if clave in texto:
-            recordar(f"Ryki: {resp}")
-            return {"reply": resp}
+    # Guardar en memoria la conversación
+    memoria_conversacion.append({"usuario": pregunta})
 
-    # --- Contexto de conversación ---
-    if any(p in texto for p in ["eso", "anterior", "también", "sirve", "funciona", "lo de"]):
-        tema = obtener_tema_anterior()
-        if tema:
-            resultado = buscar_wikipedia(f"{tema} {texto}") or buscar_duckduckgo(f"{tema} {texto}")
-            if resultado:
-                respuesta = f"Sobre lo que se mencionó antes ('{tema}'): {resultado}"
-                recordar(f"Ryki: {respuesta}")
-                return {"reply": respuesta}
+    respuesta = None
 
-    # --- Buscar información general ---
-    resultado = buscar_wikipedia(texto) or buscar_duckduckgo(texto)
-    if resultado:
-        recordar(f"Ryki: {resultado}")
-        return {"reply": resultado}
+    # Buscar respuestas en los diccionarios
+    for clave, valor in {**respuestas_basicas, **respuestas_educativas}.items():
+        if clave in pregunta:
+            respuesta = valor
+            break
 
-    # --- Si no encuentra nada ---
-    respuesta = "No estoy seguro sobre eso , pero puedo seguir aprendiendo de lo que me digan los usuarios."
-    recordar(f"Ryki: {respuesta}")
-    return {"reply": respuesta}
+    # Si no encontró respuesta, buscar en Internet
+    if not respuesta:
+        respuesta = buscar_internet(pregunta)
+
+    memoria_conversacion.append({"ryki": respuesta})
+    return JSONResponse({"respuesta": respuesta})
+
+
+# --- Página principal ---
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    ruta_html = os.path.join(os.path.dirname(__file__), "index.html")
+    with open(ruta_html, "r", encoding="utf-8") as f:
+        return f.read()
