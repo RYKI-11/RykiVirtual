@@ -16,11 +16,11 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 
 # --- Datos básicos del asistente ---
 respuestas_basicas = {
-    "hola": "¡Hola! Soy Ryki Virtual 😊 ¿en qué puedo ayudarte hoy?",
+    "hola": "¡Hola! Soy Ryki Virtual  ¿en qué puedo ayudarte hoy?",
     "como estas": "Estoy muy bien, ¡gracias por preguntar! ¿y tú?",
-    "quien eres": "Soy Ryki Virtual, tu asistente inteligente creado por ti 😎",
-    "adios": "¡Hasta luego! Espero verte pronto 👋",
-    "que puedes hacer": "Puedo responderte cosas básicas, ayudarte con preguntas de primaria y secundaria, y buscar información en Internet 🔍",
+    "quien eres": "Soy Ryki Virtual, tu asistente inteligente creado por ti ",
+    "adios": "¡Hasta luego! Espero verte pronto ",
+    "que puedes hacer": "Puedo responderte cosas básicas, ayudarte con preguntas de primaria y secundaria, y buscar información en Internet ",
 }
 
 # --- Preguntas educativas ---
@@ -55,7 +55,7 @@ def buscar_internet(pregunta: str) -> str:
                     return resultados[0]["body"]
         except Exception:
             pass
-    return "No encontré una respuesta clara en Internet 😕"
+    return "No encontré una respuesta clara en Internet "
 
 
 # --- Endpoint del chat ---
