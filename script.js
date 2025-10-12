@@ -2,57 +2,36 @@ const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
-// 🔗 Cambia esta URL si la tuya en Render es diferente
-const API_URL = "https://rykivirtual.onrender.com/chat";
-
-// Función para agregar mensajes al chat
-function addMessage(sender, text) {
-    const messageDiv = document.createElement("div");
-    messageDiv.classList.add("message", sender);
-
-    const content = document.createElement("p");
-    content.textContent = text;
-
-    messageDiv.appendChild(content);
-    chatBox.appendChild(messageDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Función para enviar el mensaje al servidor
 async function sendMessage() {
-    const message = userInput.value.trim();
-    if (!message) return;
+  const message = userInput.value.trim();
+  if (!message) return;
 
-    addMessage("user", message);
-    userInput.value = "";
+  appendMessage(message, "user");
+  userInput.value = "";
 
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-        });
+  try {
+    const res = await fetch("https://rykivirtual.onrender.com/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
 
-        if (!response.ok) {
-            throw new Error("Error al comunicarse con el servidor");
-        }
-
-        const data = await response.json();
-        const reply = data.response || "Lo siento, no entendí eso 😅";
-        addMessage("bot", reply);
-
-    } catch (error) {
-        console.error("Error:", error);
-        addMessage("bot", "⚠️ Error al conectar con Ryki Virtual. Intenta de nuevo más tarde.");
-    }
+    const data = await res.json();
+    appendMessage(data.response, "bot");
+  } catch (error) {
+    appendMessage("⚠️ Error al conectar con el servidor.", "bot");
+  }
 }
 
-// Enviar al hacer clic en el botón
-sendBtn.addEventListener("click", sendMessage);
+function appendMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.textContent = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-// Enviar al presionar Enter
-userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        sendMessage();
-    }
+sendBtn.addEventListener("click", sendMessage);
+userInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
 });
