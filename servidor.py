@@ -47,7 +47,7 @@ async def chat(request: Request):
     mensaje = data.get("message", "").lower().strip()
 
     if not mensaje:
-        return JSONResponse({"response": "Por favor, escribe algo para que Ryki Virtual pueda responderte "})
+        return JSONResponse({"response": "Por favor, escribe algo para que Ryki Virtual pueda responderte"})
 
     # Añadir mensaje a la memoria
     memory.append({"user": mensaje})
@@ -55,7 +55,8 @@ async def chat(request: Request):
     # Respuestas básicas
     respuestas = {
         "hola": "¡Hola! Soy Ryki Virtual  ¿en qué puedo ayudarte hoy?",
-        "cómo estás": "Estoy genial, gracias por preguntar. ¿Y tú?",.",
+        "cómo estás": "Estoy genial, gracias por preguntar. ¿Y tú?",
+        "quién te creó": "Fui creado por un desarrollador curioso como tú .",
         "adiós": "¡Hasta luego!  Espero que vuelvas pronto.",
         "qué puedes hacer": "Puedo responder preguntas básicas, buscar información y ayudarte a aprender .",
         "abc": "El abecedario es: A, B, C, D, E, F, G, H, I, J, K, L, M, N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z."
@@ -84,4 +85,3 @@ async def chat(request: Request):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))  # Render asigna el puerto automáticamente
     uvicorn.run("servidor:app", host="0.0.0.0", port=port)
-
