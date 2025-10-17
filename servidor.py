@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 import wikipedia
@@ -9,7 +10,7 @@ from duckduckgo_search import DDGS
 # Inicializar FastAPI
 app = FastAPI()
 
-# Permitir peticiones desde cualquier origen (necesario para el frontend)
+# Permitir peticiones desde cualquier origen (para el frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -40,48 +41,59 @@ def buscar_duckduckgo(pregunta):
     except:
         return None
 
-# Respuesta principal del asistente
+# Ruta para el chat
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
     mensaje = data.get("message", "").lower().strip()
 
     if not mensaje:
-        return JSONResponse({"response": "Por favor, escribe algo para que Ryki Virtual pueda responderte"})
+        return JSONResponse({"response": "Por favor, escribe algo para que Ryki Virtual pueda responderte."})
 
-    # Añadir mensaje a la memoria
+    # Añadir mensaje del usuario a la memoria
     memory.append({"user": mensaje})
 
     # Respuestas básicas
     respuestas = {
-        "hola": "¡Hola! Soy Ryki Virtual  ¿en qué puedo ayudarte hoy?",
+        "hola": "¡Hola! Soy Ryki Virtual 🤖 ¿en qué puedo ayudarte hoy?",
         "cómo estás": "Estoy genial, gracias por preguntar. ¿Y tú?",
-        "quién te creó": "Fui creado por un desarrollador curioso como tú .",
-        "adiós": "¡Hasta luego!  Espero que vuelvas pronto.",
-        "qué puedes hacer": "Puedo responder preguntas básicas, buscar información y ayudarte a aprender .",
+        "quién te creó": "Fui creado por un desarrollador curioso como tú 😄.",
+        "adiós": "¡Hasta luego! 👋 Espero que vuelvas pronto.",
+        "qué puedes hacer": "Puedo responder preguntas, buscar información y ayudarte a aprender 📚.",
         "abc": "El abecedario es: A, B, C, D, E, F, G, H, I, J, K, L, M, N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z."
     }
 
     respuesta = respuestas.get(mensaje)
 
     if not respuesta:
-        # Intentar buscar en Wikipedia
+        # Buscar primero en Wikipedia
         respuesta = buscar_wikipedia(mensaje)
         if not respuesta:
             # Si Wikipedia no tiene nada, buscar en DuckDuckGo
             respuesta = buscar_duckduckgo(mensaje)
             if not respuesta:
-                respuesta = "Lo siento , no encontré información sobre eso."
+                respuesta = "Lo siento 😔, no encontré información sobre eso."
 
-    # Añadir respuesta a la memoria
+    # Añadir respuesta de Ryki a la memoria
     memory.append({"ryki": respuesta})
 
     return JSONResponse({"response": respuesta, "memory": memory})
 
 
 # -------------------------------
-# CORRECCIÓN PARA RENDER (PUERTO)
+# SERVIR EL FRONTEND (HTML, CSS, JS)
+# -------------------------------
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+@app.get("/")
+async def home():
+    return FileResponse("index.html")
+
+
+# -------------------------------
+# CONFIGURACIÓN PARA RENDER
 # -------------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # Render asigna el puerto automáticamente
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run("servidor:app", host="0.0.0.0", port=port)
+
