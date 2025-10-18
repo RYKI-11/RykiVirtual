@@ -10,7 +10,7 @@ from duckduckgo_search import DDGS
 # Inicializar FastAPI
 app = FastAPI()
 
-# Permitir peticiones desde cualquier origen (para el frontend)
+# Permitir peticiones desde cualquier origen (necesario para frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,7 +19,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Memoria de conversación
+# -------------------------------
+#  SERVIR ARCHIVOS ESTÁTICOS (frontend)
+# -------------------------------
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+async def root():
+    return FileResponse("static/index.html")
+
+# -------------------------------
+#  MEMORIA DE CONVERSACIÓN
+# -------------------------------
 memory = []
 
 # Función para buscar en Wikipedia
@@ -41,7 +52,9 @@ def buscar_duckduckgo(pregunta):
     except:
         return None
 
-# Ruta para el chat
+# -------------------------------
+#  RUTA PRINCIPAL DEL CHAT
+# -------------------------------
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
@@ -55,45 +68,33 @@ async def chat(request: Request):
 
     # Respuestas básicas
     respuestas = {
-        "hola": "¡Hola! Soy Ryki Virtual 🤖 ¿en qué puedo ayudarte hoy?",
-        "cómo estás": "Estoy genial, gracias por preguntar. ¿Y tú?",
-        "quién te creó": "Fui creado por un desarrollador curioso como tú 😄.",
+        "hola": "¡Hola! Soy Ryki Virtual 😊 ¿en qué puedo ayudarte hoy?",
+        "cómo estás": "Estoy genial, gracias por preguntar 😄 ¿y tú?",
+        "quién te creó": "Fui creado por un desarrollador curioso como tú 👩‍💻.",
         "adiós": "¡Hasta luego! 👋 Espero que vuelvas pronto.",
-        "qué puedes hacer": "Puedo responder preguntas, buscar información y ayudarte a aprender 📚.",
+        "qué puedes hacer": "Puedo responder preguntas, buscar información y ayudarte a aprender 📘.",
         "abc": "El abecedario es: A, B, C, D, E, F, G, H, I, J, K, L, M, N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z."
     }
 
     respuesta = respuestas.get(mensaje)
 
+    # Si no hay respuesta, buscar en Wikipedia o DuckDuckGo
     if not respuesta:
-        # Buscar primero en Wikipedia
         respuesta = buscar_wikipedia(mensaje)
         if not respuesta:
-            # Si Wikipedia no tiene nada, buscar en DuckDuckGo
             respuesta = buscar_duckduckgo(mensaje)
             if not respuesta:
-                respuesta = "Lo siento 😔, no encontré información sobre eso."
+                respuesta = "Lo siento 😢, no encontré información sobre eso."
 
-    # Añadir respuesta de Ryki a la memoria
+    # Añadir respuesta del bot a la memoria
     memory.append({"ryki": respuesta})
 
     return JSONResponse({"response": respuesta, "memory": memory})
 
 
 # -------------------------------
-# SERVIR EL FRONTEND (HTML, CSS, JS)
-# -------------------------------
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
-
-@app.get("/")
-async def home():
-    return FileResponse("index.html")
-
-
-# -------------------------------
-# CONFIGURACIÓN PARA RENDER
+#  CONFIGURACIÓN PARA RENDER
 # -------------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8000))  # Render asigna el puerto automáticamente
     uvicorn.run("servidor:app", host="0.0.0.0", port=port)
-
