@@ -72,7 +72,7 @@ async def chat(request: Request):
     return JSONResponse({"response": respuesta, "memory": memorias[session_id]})
 
 # --- Servir archivos del frontend ---
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 @app.get("/")
 async def home():
