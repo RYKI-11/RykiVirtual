@@ -1,102 +1,168 @@
+/* --- ESTILO GENERAL --- */
 body {
-    background-color: #0d1117;
-    color: #f0f6fc;
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0a0f1f, #1c2a4a);
+  font-family: "Poppins", sans-serif;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
 }
 
-.chat-container {
-    background-color: #161b22;
-    border-radius: 12px;
-    padding: 20px;
-    width: 400px;
-    box-shadow: 0 0 10px #58a6ff;
+/* --- BARRA LATERAL (historial) --- */
+#sidebar {
+  width: 280px;
+  background: rgba(20, 30, 60, 0.95);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  overflow-y: auto;
 }
 
+#sidebar h2 {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #00bcd4;
+}
+
+#history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#history li {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#history li:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+/* --- FOTO DE PERFIL --- */
+#profile {
+  width: 100%;
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#profile img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid #00bcd4;
+  object-fit: cover;
+  box-shadow: 0 0 15px rgba(0, 188, 212, 0.4);
+}
+
+#profile h1 {
+  font-size: 1.5rem;
+  margin-top: 10px;
+  color: #00bcd4;
+}
+
+/* --- CAJA DE CHAT --- */
 #chat-box {
-    background-color: #0d1117;
-    border: 1px solid #30363d;
-    height: 300px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    padding: 10px;
+  flex: 1;
+  width: 90%;
+  max-width: 900px;
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
+}
+
+/* --- MENSAJES --- */
+.message {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 15px;
+  max-width: 75%;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.user {
+  background-color: #00bcd4;
+  align-self: flex-end;
+  color: #fff;
+  margin-left: auto;
+}
+
+.ryki {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  align-self: flex-start;
+}
+
+/* --- ENTRADA DE TEXTO --- */
+#input-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 30, 60, 0.8);
 }
 
 #user-input {
-    width: 75%;
-    padding: 8px;
+  width: 70%;
+  max-width: 700px;
+  padding: 15px;
+  border: none;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  outline: none;
 }
 
 #send-btn {
-    width: 20%;
-    padding: 8px;
-    background-color: #238636;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 6px;
+  margin-left: 10px;
+  background: #00bcd4;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
 }
 
 #send-btn:hover {
-    background-color: #2ea043;
+  background: #0097a7;
 }
 
-/* ===== ENCABEZADO (foto + nombre) ===== */
-.encabezado {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin-top: 40px;
-    margin-bottom: 20px;
-    color: white;
-    animation: aparecer 1s ease;
-}
-
-.perfil-foto {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #4A90E2;
-    box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
-    margin-bottom: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.perfil-foto:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(74, 144, 226, 0.8);
-}
-
-.titulo {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 5px 0;
-}
-
-.subtitulo {
-    font-size: 1rem;
-    color: #b0c7ff;
-    letter-spacing: 1px;
-}
-
-/* Animación de entrada */
-@keyframes aparecer {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.perfil-foto {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%; /* Hace la imagen redonda */
-  border: 3px solid #00aaff; /* Borde azul */
-  display: block;
-  margin: 20px auto; /* Centrar */
-  object-fit: cover; /* Ajusta la imagen dentro del círculo */
+/* --- ANIMACIÓN --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

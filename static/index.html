@@ -1,23 +1,39 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ryki Virtual</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ryki Virtual</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body><!-- Encabezado con foto de perfil y nombre -->
-<header class="encabezado">
-  <img src="/static/perfil.png" alt="Ryki Virtual" class="perfil-foto">
-  <h1 class="titulo">Ryki Virtual</h1>
-  <p class="subtitulo">Tu asistente inteligente</p>
-</header>
-    <div class="chat-container">
-        <h1> Ryki Virtual</h1>
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+<body>
+ <div id="profile">
+  <img src="static/ryki.png" alt="Ryki Virtual">
+  <h1>Ryki Virtual</h1>
+</div>
+
+    <div class="container">
+    <aside class="sidebar">
+      <h2> Conversaciones</h2>
+      <ul id="history"></ul>
+    </aside>
+
+    <main class="chat">
+      <div class="header">
+        <img src="/static/perfil.png" alt="Ryki Virtual" class="perfil-foto">
+        <h1>Ryki Virtual</h1>
+      </div>
+
+      <div id="chat-box" class="chat-box"></div>
+
+      <div class="input-area">
+        <textarea id="user-input" placeholder="Escribe tu mensaje..." rows="3"></textarea>
         <button id="send-btn">Enviar</button>
-    </div>
-    <script src="/static/script.js"></script>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
