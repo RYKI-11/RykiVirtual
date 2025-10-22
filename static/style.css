@@ -43,3 +43,60 @@ body {
 #send-btn:hover {
     background-color: #2ea043;
 }
+
+/* ===== ENCABEZADO (foto + nombre) ===== */
+.encabezado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: white;
+    animation: aparecer 1s ease;
+}
+
+.perfil-foto {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4A90E2;
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+    margin-bottom: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.perfil-foto:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.8);
+}
+
+.titulo {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
+.subtitulo {
+    font-size: 1rem;
+    color: #b0c7ff;
+    letter-spacing: 1px;
+}
+
+/* Animación de entrada */
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.perfil-foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Hace la imagen redonda */
+  border: 3px solid #00aaff; /* Borde azul */
+  display: block;
+  margin: 20px auto; /* Centrar */
+  object-fit: cover; /* Ajusta la imagen dentro del círculo */
+}
