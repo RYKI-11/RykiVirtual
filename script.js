@@ -1,80 +1,67 @@
 
-const chatBox = document.getElementById("chat-box");
-const userInput = document.getElementById("user-input");
+const input = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
-const historyList = document.getElementById("history");
+const chatBox = document.getElementById("chat-box");
+const chatHistory = document.getElementById("chat-history");
 
-const sessionId = "ryki_session";
-let conversations = JSON.parse(localStorage.getItem(sessionId)) || [];
+let conversations = [];
+let currentChat = [];
 
-// Mostrar historial previo al cargar
-window.addEventListener("load", () => {
-  conversations.forEach((msg) => {
-    if (msg.user) appendMessage("user", msg.user);
-    if (msg.ryki) appendMessage("ryki", msg.ryki);
-  });
-  updateHistory();
-});
-
-// Enviar mensaje
-async function sendMessage() {
-  const message = userInput.value.trim();
-  if (!message) return;
-
-  appendMessage("user", message);
-  conversations.push({ user: message });
-  userInput.value = "";
-  saveConversations();
-
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, session_id: sessionId }),
-    });
-
-    const data = await res.json();
-    appendMessage("ryki", data.response);
-    conversations.push({ ryki: data.response });
-    saveConversations();
-    updateHistory();
-  } catch (error) {
-    appendMessage("ryki", "⚠️ Error de conexión con el servidor.");
-  }
-}
-
-// Mostrar mensajes en el chat
-function appendMessage(sender, text) {
+// Función para mostrar mensajes en pantalla
+function addMessage(text, sender) {
   const msg = document.createElement("div");
-  msg.classList.add("message", sender);
+  msg.classList.add(sender === "user" ? "user-message" : "bot-message");
   msg.textContent = text;
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Guardar conversaciones en localStorage
-function saveConversations() {
-  localStorage.setItem(sessionId, JSON.stringify(conversations));
+// Enviar mensaje
+async function sendMessage() {
+  const message = input.value.trim();
+  if (!message) return;
+
+  addMessage(message, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+
+    const data = await res.json();
+    addMessage(data.response, "bot");
+
+    // Guardar conversación
+    currentChat.push({ user: message, bot: data.response });
+  } catch {
+    addMessage("Error al conectar con el servidor.", "bot");
+  }
 }
 
-// Actualizar historial lateral
-function updateHistory() {
-  historyList.innerHTML = "";
-  conversations.forEach((msg) => {
-    const li = document.createElement("li");
-    li.textContent = msg.user || msg.ryki;
-    historyList.appendChild(li);
-  });
-}
-
-// --- EVENTOS ---
-// Enviar con clic
+// Enviar con botón
 sendBtn.addEventListener("click", sendMessage);
 
-// Enviar con Enter (Shift+Enter = salto de línea)
-userInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+// Enviar con ENTER
+input.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
+
+// Guardar conversación en la barra lateral
+window.addEventListener("beforeunload", () => {
+  if (currentChat.length > 0) {
+    conversations.push(currentChat);
+    const li = document.createElement("li");
+    li.textContent = `Chat ${conversations.length}`;
+    li.addEventListener("click", () => {
+      chatBox.innerHTML = "";
+      currentChat.forEach((msg) => {
+        addMessage(msg.user, "user");
+        addMessage(msg.bot, "bot");
+      });
+    });
+    chatHistory.appendChild(li);
   }
 });

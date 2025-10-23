@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+import uvicorn
 import os
 import wikipedia
 from duckduckgo_search import DDGS
@@ -9,7 +10,7 @@ from duckduckgo_search import DDGS
 # Inicializar FastAPI
 app = FastAPI()
 
-# Permitir peticiones desde cualquier origen
+# Permitir peticiones desde cualquier origen (frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,17 +19,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Memoria de conversación por sesión
-memorias = {}
+# Servir archivos estáticos (carpeta /static)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# --- Funciones auxiliares ---
+# Página principal (index.html)
+@app.get("/")
+async def home():
+    return FileResponse("index.html")
+
+# Memoria de conversación
+memory = []
+
+# Función para buscar en Wikipedia
 def buscar_wikipedia(pregunta):
     try:
         wikipedia.set_lang("es")
-        return wikipedia.summary(pregunta, sentences=2)
+        resumen = wikipedia.summary(pregunta, sentences=2)
+        return resumen
     except:
         return None
 
+# Función para buscar en DuckDuckGo
 def buscar_duckduckgo(pregunta):
     try:
         with DDGS() as ddgs:
@@ -38,48 +49,42 @@ def buscar_duckduckgo(pregunta):
     except:
         return None
 
-# --- RUTA PRINCIPAL DEL CHAT ---
+# Ruta principal del chat
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
     mensaje = data.get("message", "").lower().strip()
-    session_id = data.get("session_id", "default")
 
     if not mensaje:
-        return JSONResponse({"response": "Por favor, escribe algo."})
+        return JSONResponse({"response": "Por favor, escribe algo para que Ryki Virtual pueda responderte."})
 
-    if session_id not in memorias:
-        memorias[session_id] = []
-
-    memorias[session_id].append({"user": mensaje})
+    memory.append({"user": mensaje})
 
     respuestas = {
-        "hola": "¡Hola! Soy Ryki Virtual, tu asistente. ",
-        "cómo estás": "Estoy genial, gracias. ¿Y tú?",
-        "quién te creó": "Fui creada por un desarrollador curioso como tú .",
-        "adiós": "¡Hasta luego! Espero volver a hablar contigo ",
-        "qué puedes hacer": "Puedo conversar contigo, responder preguntas, buscar información y aprender del contexto .",
+        "hola": "¡Hola! Soy Ryki Virtual  ¿En qué puedo ayudarte hoy?",
+        "cómo estás": "Estoy genial, gracias por preguntar  ¿Y tú?",
+        "quién te creó": "Fui creada por un desarrollador curioso llamado Raúl ",
+        "adiós": "¡Hasta luego!  Espero que vuelvas pronto.",
+        "qué puedes hacer": "Puedo responder preguntas básicas, buscar información y aprender contigo 💡",
+        "abc": "El abecedario es: A, B, C, D, E, F, G, H, I, J, K, L, M, N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z."
     }
 
     respuesta = respuestas.get(mensaje)
+
     if not respuesta:
-        respuesta = buscar_wikipedia(mensaje) or buscar_duckduckgo(mensaje)
+        respuesta = buscar_wikipedia(mensaje)
         if not respuesta:
-            respuesta = "Lo siento , no encontré información sobre eso."
+            respuesta = buscar_duckduckgo(mensaje)
+            if not respuesta:
+                respuesta = "Lo siento , no encontré información sobre eso."
 
-    memorias[session_id].append({"ryki": respuesta})
+    memory.append({"ryki": respuesta})
+    return JSONResponse({"response": respuesta, "memory": memory})
 
-    return JSONResponse({"response": respuesta, "memory": memorias[session_id]})
 
-# --- Servir archivos del frontend ---
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-@app.get("/")
-async def home():
-    return FileResponse("index.html")
-
-# --- Iniciar servidor ---
+# -------------------------------
+# Configuración para Render
+# -------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    import uvicorn
     uvicorn.run("servidor:app", host="0.0.0.0", port=port)
