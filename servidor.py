@@ -24,7 +24,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Página principal (index.html)
 @app.get("/")
-async def home():
+async def root():
     return FileResponse("index.html")
 
 # Memoria de conversación
@@ -64,8 +64,9 @@ async def chat(request: Request):
         "hola": "¡Hola! Soy Ryki Virtual  ¿En qué puedo ayudarte hoy?",
         "cómo estás": "Estoy genial, gracias por preguntar  ¿Y tú?",
         "quién te creó": "Fui creada por un desarrollador curioso llamado Raúl ",
+        "conozco a tu creador": "Ya lo se, es un chavalin de casi 15 años ",
         "adiós": "¡Hasta luego!  Espero que vuelvas pronto.",
-        "qué puedes hacer": "Puedo responder preguntas básicas, buscar información y aprender contigo 💡",
+        "qué puedes hacer": "Puedo responder preguntas básicas, buscar información y aprender contigo ",
         "abc": "El abecedario es: A, B, C, D, E, F, G, H, I, J, K, L, M, N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z."
     }
 
