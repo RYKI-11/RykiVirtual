@@ -1,126 +1,92 @@
 body {
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #0d1117;
-  color: white;
-  display: flex;
-  height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #0A0F24;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
-/* Estructura principal */
-.container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
-/* Barra lateral */
-.sidebar {
-  width: 250px;
-  background: #161b22;
-  border-right: 2px solid #30363d;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.sidebar h2 {
-  text-align: center;
-  color: #58a6ff;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  padding: 10px;
-  background: #21262d;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.sidebar li:hover {
-  background: #30363d;
-}
-
-/* Contenedor de chat */
 .chat-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    height: 80vh;
+    background-color: #1A213F;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow: hidden;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 5px;
 }
 
-.avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid #58a6ff;
+.message {
+    max-width: 75%;
+    padding: 12px;
+    border-radius: 12px;
 }
 
-.chat-box {
-  flex: 1;
-  background: #161b22;
-  padding: 15px;
-  border-radius: 12px;
-  overflow-y: auto;
-  margin-top: 10px;
-  margin-bottom: 10px;
+.user {
+    align-self: flex-end;
+    background-color: #0078FF;
 }
 
-/* Mensajes */
-.user-message, .bot-message {
-  padding: 10px 15px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  max-width: 80%;
-  word-wrap: break-word;
+.bot {
+    align-self: flex-start;
+    background-color: #6E85B7;
 }
 
-.user-message {
-  background: #238636;
-  align-self: flex-end;
-}
-
-.bot-message {
-  background: #30363d;
-  align-self: flex-start;
-}
-
-/* Input */
 .input-container {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
-#user-input {
-  flex: 1;
-  padding: 15px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
 }
 
-#send-btn {
-  background: #58a6ff;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 15px 25px;
-  cursor: pointer;
-  font-size: 16px;
+button {
+    padding: 12px 15px;
+    background-color: #0078FF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
-#send-btn:hover {
-  background: #1f6feb;
+button:hover {
+    background-color: #005FCC;
+}
+
+/* ✅ Diseño para móviles */
+@media (max-width: 600px) {
+    .chat-container {
+        height: 90vh;
+    }
+
+    input {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+    }
 }
