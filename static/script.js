@@ -1,43 +1,62 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("message");
+  const chatBox = document.getElementById("chat-box");
+  const clearButton = document.getElementById("clear-chat");
 
-const input = document.getElementById("userInput");
-const messages = document.getElementById("messages");
-const clearBtn = document.getElementById("clearBtn");
+  if (!form || !input || !chatBox) {
+    console.error("⚠️ Error: Elementos del DOM no encontrados.");
+    return;
+  }
 
-function agregarMensaje(texto, tipo) {
-    const msg = document.createElement("div");
-    msg.classList.add("message", tipo);
-    msg.textContent = texto;
-    messages.appendChild(msg);
-    messages.scrollTop = messages.scrollHeight;
-}
+  // Enviar mensaje
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
 
-async function enviarMensaje() {
-    const mensaje = input.value.trim();
-    if (!mensaje) return;
-
-    agregarMensaje(mensaje, "user");
+    appendMessage("Tú", message);
     input.value = "";
 
-    const res = await fetch("https://rykivirtual.onrender.com/chat", {
+    try {
+      const response = await fetch("/chat", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({mensaje})
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          user_id: "usuario_demo",
+        }),
+      });
+
+      const data = await response.json();
+      appendMessage("Ryki Virtual", data.response);
+    } catch (err) {
+      appendMessage("Ryki Virtual", "❌ Error al conectar con el servidor.");
+      console.error(err);
+    }
+  });
+
+  // Enviar con ENTER
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      form.dispatchEvent(new Event("submit"));
+    }
+  });
+
+  // Botón de borrar conversación
+  if (clearButton) {
+    clearButton.addEventListener("click", () => {
+      chatBox.innerHTML = "";
     });
+  }
 
-    const data = await res.json();
-    agregarMensaje(data.respuesta, "bot");
-}
-
-// ✅ Enviar con ENTER
-input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") enviarMensaje();
-});
-
-// ✅ Botón borrar memoria
-clearBtn.addEventListener("click", async () => {
-    await fetch("https://rykivirtual.onrender.com/memoria", {
-        method: "DELETE"
-    });
-    messages.innerHTML = "";
-    agregarMensaje("Memoria borrada ✅", "bot");
+  // Mostrar mensajes
+  function appendMessage(sender, message) {
+    const msg = document.createElement("div");
+    msg.classList.add("message");
+    msg.innerHTML = `<strong>${sender}:</strong> ${message}`;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 });

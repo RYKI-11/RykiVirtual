@@ -1,39 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ryki Virtual </title>
-  <link rel="stylesheet" href="static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ryki Virtual</title>
+  <link rel="stylesheet" href="static/style.css" />
 </head>
 <body>
-  <div class="container">
+  <header>
+    <img src="static/avatar.png" alt="Ryki Virtual" class="avatar" />
+    <h1>Ryki Virtual</h1>
+  </header>
 
-    <!-- Barra lateral -->
-    <aside class="sidebar">
-      <h2>Conversaciones</h2>
-      <ul id="chat-history"></ul>
-    </aside>
+  <main>
+    <!-- Caja de chat -->
+    <div id="chat-box" class="chat-box"></div>
 
-    <!-- Contenedor principal -->
-    <main class="chat-container">
-      <div class="header">
-        <img src="static/avatar.png" alt="Ryki" class="avatar">
-        <h1>Ryki Virtual</h1>
-      </div>
+    <!-- Formulario de entrada -->
+    <form id="chat-form" class="chat-form">
+      <input
+        id="message"
+        type="text"
+        placeholder="Escribe tu mensaje y presiona Enter..."
+        autocomplete="off"
+      />
+      <button type="submit">Enviar</button>
+    </form>
 
-      <div id="chat-box" class="chat-box"></div>
-
-      <div class="input-container">
-        <input type="text" id="user-input" placeholder="Escribe un mensaje..." />
-        <button id="clearBtn">🗑 Borrar conversación</button>
-        <button id="send-btn">Enviar</button>
-      </div>
-    </main>
-
-  </div>
+    <!-- Botón para borrar chat -->
+    <button id="clear-chat" class="clear-btn">🗑️ Borrar conversación</button>
+  </main>
 
   <script src="static/script.js"></script>
 </body>
 </html>
-
