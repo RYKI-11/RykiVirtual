@@ -2,7 +2,7 @@ const botonBuscar = document.getElementById("search-button");
 const inputBusqueda = document.getElementById("search-input");
 const contenedorResultados = document.getElementById("results");
 
-const API_URL = "https://tu-nombre-de-app-en-render.onrender.com"; // 🔹 cambia esto por tu URL real de Render
+const API_URL = "https://rykivirtual.onrender.com"; // 🔹 cambia esto por tu URL real de Render
 
 async function buscar() {
     const consulta = inputBusqueda.value.trim();
@@ -39,3 +39,4 @@ botonBuscar.addEventListener("click", buscar);
 inputBusqueda.addEventListener("keypress", e => {
     if (e.key === "Enter") buscar();
 });
+
