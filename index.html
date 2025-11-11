@@ -1,36 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ryki Virtual</title>
-  <link rel="stylesheet" href="static/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador Inteligente</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <img src="static/avatar.png" alt="Ryki Virtual" class="avatar" />
-    <h1>Ryki Virtual</h1>
-  </header>
+    <div class="container">
+        <h1>🔎 Buscador Inteligente</h1>
 
-  <main>
-    <!-- Caja de chat -->
-    <div id="chat-box" class="chat-box"></div>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Escribe tu búsqueda...">
+            <button id="search-button">Buscar</button>
+        </div>
 
-    <!-- Formulario de entrada -->
-    <form id="chat-form" class="chat-form">
-      <input
-        id="message"
-        type="text"
-        placeholder="Escribe tu mensaje y presiona Enter..."
-        autocomplete="off"
-      />
-      <button type="submit">Enviar</button>
-    </form>
+        <div id="results"></div>
+    </div>
 
-    <!-- Botón para borrar chat -->
-    <button id="clear-chat" class="clear-btn">🗑️ Borrar conversación</button>
-  </main>
-
-  <script src="static/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
