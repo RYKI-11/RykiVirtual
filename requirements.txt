@@ -2,3 +2,4 @@ fastapi
 uvicorn
 wikipedia
 ddgs
+duckduckgo-search
