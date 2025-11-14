@@ -2,23 +2,40 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador Inteligente</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Ryki Virtual</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🔎 Buscador Inteligente</h1>
 
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Escribe tu búsqueda...">
-            <button id="search-button">Buscar</button>
-        </div>
+<div id="sidebar">
+    <h2>Chats</h2>
+    <ul id="lista-chats">
+        {% for c in chats %}
+        <li class="chat-item {% if c == chat_actual %}activo{% endif %}" data-nombre="{{ c }}">
+            {{ c }}
+        </li>
+        {% endfor %}
+    </ul>
 
-        <div id="results"></div>
+    <button id="nuevo-chat">Nuevo chat</button>
+    <button id="borrar-chat">Borrar chat</button>
+</div>
+
+<div id="chat-container">
+
+    <div id="chat-box"></div>
+
+    <div id="input-area">
+        <input type="text" id="message" placeholder="Escribe aquí...">
+        <button id="send">Enviar</button>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<script>
+    const chatActual = "{{ chat_actual }}";
+</script>
+
+<script src="/static/script.js"></script>
+
 </body>
 </html>
-

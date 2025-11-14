@@ -1,42 +1,71 @@
-const botonBuscar = document.getElementById("search-button");
-const inputBusqueda = document.getElementById("search-input");
-const contenedorResultados = document.getElementById("results");
+const input = document.getElementById("message");
+const sendBtn = document.getElementById("send");
+const chatBox = document.getElementById("chat-box");
 
-const API_URL = "https://rykivirtual.onrender.com"; // 🔹 cambia esto por tu URL real de Render
+const btnNuevoChat = document.getElementById("nuevo-chat");
+const btnBorrarChat = document.getElementById("borrar-chat");
+const listaChats = document.querySelectorAll(".chat-item");
 
-async function buscar() {
-    const consulta = inputBusqueda.value.trim();
-    if (!consulta) return;
-
-    contenedorResultados.innerHTML = "<p>🔄 Buscando...</p>";
-
-    try {
-        const respuesta = await fetch(`${API_URL}/buscar?query=${encodeURIComponent(consulta)}`);
-        const datos = await respuesta.json();
-
-        contenedorResultados.innerHTML = "";
-        datos.resultados.forEach(r => {
-            const div = document.createElement("div");
-            div.classList.add("resultado");
-            div.innerHTML = `
-                <h3>${r.titulo}</h3>
-                <p>${r.contenido}</p>
-                ${r.url ? `<a href="${r.url}" target="_blank">Ver más</a>` : ""}
-                <span class="fuente">Fuente: ${r.fuente}</span>
-            `;
-            contenedorResultados.appendChild(div);
-        });
-    } catch (error) {
-        contenedorResultados.innerHTML = "<p>❌ Error al conectar con el servidor.</p>";
-        console.error(error);
-    }
+function agregarMensaje(tipo, texto) {
+    const div = document.createElement("div");
+    div.className = tipo === "user" ? "msg user" : "msg bot";
+    div.textContent = texto;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// 🔹 Ejecutar búsqueda al hacer clic
-botonBuscar.addEventListener("click", buscar);
-
-// 🔹 Ejecutar búsqueda al presionar Enter
-inputBusqueda.addEventListener("keypress", e => {
-    if (e.key === "Enter") buscar();
+sendBtn.addEventListener("click", enviarMensaje);
+input.addEventListener("keypress", e => {
+    if (e.key === "Enter") enviarMensaje();
 });
 
+function enviarMensaje() {
+    const texto = input.value.trim();
+    if (!texto) return;
+
+    agregarMensaje("user", texto);
+    input.value = "";
+
+    const formData = new FormData();
+    formData.append("message", texto);
+
+    fetch("/chat", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            agregarMensaje("bot", data.respuesta);
+        });
+}
+
+// Cambiar chat
+listaChats.forEach(item => {
+    item.addEventListener("click", () => {
+        const nombre = item.dataset.nombre;
+
+        const fd = new FormData();
+        fd.append("nombre", nombre);
+
+        fetch("/cambiar_chat", { method: "POST", body: fd })
+            .then(() => location.reload());
+    });
+});
+
+// Crear nuevo chat
+btnNuevoChat.addEventListener("click", () => {
+    const nombre = "chat_" + Math.floor(Math.random() * 9999);
+
+    const fd = new FormData();
+    fd.append("nombre", nombre);
+
+    fetch("/cambiar_chat", { method: "POST", body: fd })
+        .then(() => location.reload());
+});
+
+// Borrar chat
+btnBorrarChat.addEventListener("click", () => {
+    const nombre = chatActual;
+    const fd = new FormData();
+    fd.append("nombre", nombre);
+
+    fetch("/borrar_chat", { method: "POST", body: fd })
+        .then(() => location.reload());
+});
