@@ -14,11 +14,11 @@ templates = Jinja2Templates(directory="templates")
 wikipedia.set_lang("es")
 
 respuestas = [
- "Interesante 🤔",
+ "Interesante",
  "Cuéntame más",
  "Eso suena bien",
  "Entiendo",
- "Vaya 😮",
+ "Vaya",
  "Genial!"
 ]
 
@@ -49,3 +49,4 @@ async def chat(data: dict):
         reply = random.choice(respuestas)
 
     return {"reply":reply}
+
