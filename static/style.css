@@ -21,8 +21,7 @@ color:#4fc3f7;
 }
 
 #chatBox{
-width:400px;
-height:300px;
+height: 300px; width: 300px;
 overflow:auto;
 background:#000;
 padding:10px;
