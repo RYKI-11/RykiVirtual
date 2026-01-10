@@ -1,62 +1,37 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("chat-form");
-  const input = document.getElementById("message");
-  const chatBox = document.getElementById("chat-box");
-  const clearButton = document.getElementById("clear-chat");
+const input = document.getElementById("userInput");
+const send = document.getElementById("sendBtn");
+const clear = document.getElementById("clearBtn");
+const chat = document.getElementById("chatBox");
 
-  if (!form || !input || !chatBox) {
-    console.error("⚠️ Error: Elementos del DOM no encontrados.");
-    return;
-  }
+send.onclick = sendMsg;
+clear.onclick = clearChat;
 
-  // Enviar mensaje
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const message = input.value.trim();
-    if (!message) return;
+function add(text,cls){
+ let d = document.createElement("div");
+ d.className = cls;
+ d.innerText = text;
+ chat.appendChild(d);
+ chat.scrollTop = chat.scrollHeight;
+}
 
-    appendMessage("Tú", message);
-    input.value = "";
+async function sendMsg(){
 
-    try {
-      const response = await fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message,
-          user_id: "usuario_demo",
-        }),
-      });
+ let msg = input.value;
+ if(!msg) return;
 
-      const data = await response.json();
-      appendMessage("Ryki Virtual", data.response);
-    } catch (err) {
-      appendMessage("Ryki Virtual", "❌ Error al conectar con el servidor.");
-      console.error(err);
-    }
-  });
+ add("Tú: "+msg,"user");
+ input.value="";
 
-  // Enviar con ENTER
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      form.dispatchEvent(new Event("submit"));
-    }
-  });
+ let r = await fetch("/chat",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({message:msg})
+ });
 
-  // Botón de borrar conversación
-  if (clearButton) {
-    clearButton.addEventListener("click", () => {
-      chatBox.innerHTML = "";
-    });
-  }
+ let data = await r.json();
+ add("Ryki: "+data.reply,"bot");
+}
 
-  // Mostrar mensajes
-  function appendMessage(sender, message) {
-    const msg = document.createElement("div");
-    msg.classList.add("message");
-    msg.innerHTML = `<strong>${sender}:</strong> ${message}`;
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-});
+function clearChat(){
+ chat.innerHTML="";
+}
