@@ -11,7 +11,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-memory = []
+wikipedia.set_lang("es")
 
 respuestas = [
  "Interesante 🤔",
@@ -22,6 +22,10 @@ respuestas = [
  "Genial!"
 ]
 
+def es_pregunta(texto):
+    palabras = ["quien","qué","cuando","donde","por que","cómo","cuál"]
+    return texto.endswith("?") or any(p in texto for p in palabras)
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -31,25 +35,17 @@ async def chat(data: dict):
 
     msg = data.get("message","").lower()
 
-    if msg == "borrar":
-        memory.clear()
-        return {"reply":"Memoria borrada"}
-
-    if "wikipedia" in msg:
+    # SI ES PREGUNTA → BUSCAR
+    if es_pregunta(msg):
         try:
-            topic = msg.replace("wikipedia","")
-            reply = wikipedia.summary(topic, sentences=2)
+            reply = wikipedia.summary(msg, sentences=2)
         except:
-            reply = "No encontré eso en Wikipedia"
+            with DDGS() as ddgs:
+                r = list(ddgs.text(msg,max_results=1))
+                reply = r[0]["body"] if r else "No encontré información"
 
-    elif "buscar" in msg:
-        q = msg.replace("buscar","")
-        with DDGS() as ddgs:
-            r = list(ddgs.text(q,max_results=1))
-            reply = r[0]["body"] if r else "No encontré resultados"
-
+    # SI NO → RESPUESTA NORMAL
     else:
         reply = random.choice(respuestas)
-        memory.append(msg)
 
     return {"reply":reply}
