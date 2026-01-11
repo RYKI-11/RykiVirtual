@@ -1,26 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Ryki Virtual</title>
-<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Ryki Virtual</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-
 <body>
 
-<div class="chat">
+<!-- HEADER -->
+<div class="header">
+    <img src="/static/avatar.png">
+    <h1>Ryki Virtual</h1>
+</div>
 
-<h2> Ryki Virtual</h2>
+<!-- CONTENIDO -->
+<div class="main">
+    <div class="chat-box">
 
-<div id="chatBox"></div>
+        <!-- HISTORIAL -->
+        <div class="history">
+            <table id="chatTable"></table>
+        </div>
 
-<input id="userInput" placeholder="Escribe aquí...">
-<button id="sendBtn">Enviar</enter>
-<button id="clearBtn">Borrar chat</button>
+        <!-- BOTONES -->
+        <div class="buttons">
+            <button onclick="clearChat()">Borrar chat</button>
+        </div>
 
+        <!-- INPUT -->
+        <div class="input-area">
+            <input id="message" placeholder="Escribe tu mensaje...">
+            <button onclick="send()">Enviar</button>
+        </div>
+
+    </div>
 </div>
 
 <script src="/static/script.js"></script>
 </body>
 </html>
-
