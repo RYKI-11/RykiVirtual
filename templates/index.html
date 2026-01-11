@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Ryki Virtual</title>
-<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Ryki Virtual</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<div class="header">
-<img src="/static/avatar.png">
-<h1>Ryki Virtual</h1>
-</div>
+<!-- HEADER -->
+<header class="top">
+    <img src="/static/avatar.png" class="avatar">
+    <h1>Ryki Virtual</h1>
+</header>
 
-<div class="main">
-<div class="chat-box">
+<!-- CONTENEDOR -->
+<div class="container">
 
-<div class="history">
-<table id="chatTable"></table>
-</div>
+    <!-- HISTORIAL -->
+    <aside class="sidebar">
+        <h3>Conversaciones</h3>
+        <ul id="history"></ul>
+        <button onclick="clearChat()">Borrar chat</button>
+    </aside>
 
-<div class="buttons">
-<button onclick="clearChat()">Borrar chat</button>
-</div>
+    <!-- CHAT -->
+    <main class="chat">
 
-<div class="input-area">
-<input id="message" placeholder="Escribe tu mensaje...">
-<button onclick="send()">Enviar</button>
-</div>
+        <!-- MENSAJES -->
+        <div id="chat-box" class="chat-box"></div>
 
-</div>
+        <!-- FORM -->
+        <form id="chat-form">
+            <input 
+                type="text" 
+                id="message-input" 
+                placeholder="Escribe tu mensaje..."
+                autocomplete="off"
+                required
+            >
+            <button type="submit">Enviar</button>
+        </form>
+
+    </main>
 </div>
 
 <script src="/static/script.js"></script>
 </body>
 </html>
+
