@@ -1,36 +1,37 @@
-const table = document.getElementById("chatTable");
-const input = document.getElementById("message");
+const form = document.getElementById("chat-form");
+const input = document.getElementById("message-input");
+const chatBox = document.getElementById("chat-box");
 
-function addRow(user, bot) {
-    const row = document.createElement("tr");
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    const td1 = document.createElement("td");
-    td1.innerHTML = "<b>Tú:</b> " + user;
-
-    const td2 = document.createElement("td");
-    td2.innerHTML = "<b>Ryki:</b> " + bot;
-
-    row.appendChild(td1);
-    row.appendChild(td2);
-    table.appendChild(row);
-}
-
-function send() {
     const text = input.value.trim();
     if (!text) return;
 
-    fetch("/chat", {
+    addMessage("Tú", text);
+    input.value = "";
+
+    const res = await fetch("/chat", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({message: text})
-    })
-    .then(r => r.json())
-    .then(data => {
-        addRow(text, data.response);
-        input.value = "";
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: text })
     });
+
+    const data = await res.json();
+
+    addMessage("Ryki", data.response); // 👈 AQUÍ ESTABA EL ERROR
+});
+
+
+function addMessage(sender, text) {
+    const div = document.createElement("div");
+    div.className = "msg";
+
+    div.innerHTML = `<b>${sender}:</b> ${text}`;
+    chatBox.appendChild(div);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function clearChat() {
-    table.innerHTML = "";
-}
