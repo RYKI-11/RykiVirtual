@@ -1,37 +1,36 @@
-const input = document.getElementById("userInput");
-const send = document.getElementById("sendBtn");
-const clear = document.getElementById("clearBtn");
-const chat = document.getElementById("chatBox");
+const table = document.getElementById("chatTable");
+const input = document.getElementById("message");
 
-send.onclick = sendMsg;
-clear.onclick = clearChat;
+function addRow(user, bot) {
+    const row = document.createElement("tr");
 
-function add(text,cls){
- let d = document.createElement("div");
- d.className = cls;
- d.innerText = text;
- chat.appendChild(d);
- chat.scrollTop = chat.scrollHeight;
+    const td1 = document.createElement("td");
+    td1.innerHTML = "<b>Tú:</b> " + user;
+
+    const td2 = document.createElement("td");
+    td2.innerHTML = "<b>Ryki:</b> " + bot;
+
+    row.appendChild(td1);
+    row.appendChild(td2);
+    table.appendChild(row);
 }
 
-async function sendMsg(){
+function send() {
+    const text = input.value.trim();
+    if (!text) return;
 
- let msg = input.value;
- if(!msg) return;
-
- add("Tú: "+msg,"user");
- input.value="";
-
- let r = await fetch("/chat",{
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({message:msg})
- });
-
- let data = await r.json();
- add("Ryki: "+data.reply,"bot");
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: text})
+    })
+    .then(r => r.json())
+    .then(data => {
+        addRow(text, data.response);
+        input.value = "";
+    });
 }
 
-function clearChat(){
- chat.innerHTML="";
+function clearChat() {
+    table.innerHTML = "";
 }
