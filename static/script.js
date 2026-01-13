@@ -1,78 +1,66 @@
-const form = document.getElementById("chat-form");
-const input = document.getElementById("message-input");
-const chatBox = document.getElementById("chat-box");
-const history = document.getElementById("history");
+const form=document.getElementById("chat-form");
+const input=document.getElementById("msg");
+const chatBox=document.getElementById("chat-box");
+const history=document.getElementById("history");
 
-let chats = [];
+loadMemory();
 
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+form.addEventListener("submit",async e=>{
+e.preventDefault();
 
-    const message = input.value.trim();
-    if (!message) return;
+let text=input.value.trim();
+if(!text)return;
 
-    addMessage("Tú", message);
-    input.value = "";
+add("Tú",text);
+input.value="";
 
-    try {
-        const res = await fetch("/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message: message })
-        });
-
-        const data = await res.json();
-
-        // 👇 AQUÍ estaba el fallo
-        const reply = data.reply || data.response || "Error del servidor";
-
-        addMessage("Ryki", reply);
-        saveHistory(message, reply);
-
-    } catch (err) {
-        addMessage("Ryki", "Error conectando con el servidor");
-    }
+const res=await fetch("/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:text})
 });
 
-function addMessage(user, text) {
-    const div = document.createElement("div");
-    div.className = user === "Tú" ? "user" : "bot";
-    div.innerHTML = `<b>${user}:</b> ${text}`;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function saveHistory(q, a) {
-    chats.push({ q, a });
-    renderHistory();
-}
-
-function renderHistory() {
-    history.innerHTML = "";
-    chats.forEach((c, i) => {
-        const li = document.createElement("li");
-        li.textContent = c.q;
-        li.onclick = () => {
-            chatBox.innerHTML = "";
-            addMessage("Tú", c.q);
-            addMessage("Ryki", c.a);
-        };
-        history.appendChild(li);
-    });
-}
-
-function clearChat() {
-    chats = [];
-    chatBox.innerHTML = "";
-    history.innerHTML = "";
-}
-
-/* ENTER PARA ENVIAR */
-input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        form.dispatchEvent(new Event("submit"));
-    }
+const data=await res.json();
+add("Ryki",data.reply);
+loadMemory();
 });
+
+async function loadMemory(){
+const r=await fetch("/memory");
+const d=await r.json();
+
+history.innerHTML="";
+d.forEach((c,i)=>{
+let li=document.createElement("li");
+li.textContent=c[0];
+li.onclick=()=>{
+chatBox.innerHTML="";
+add("Tú",c[0]);
+add("Ryki",c[1]);
+}
+history.appendChild(li);
+});
+}
+
+function add(who,msg){
+let div=document.createElement("div");
+div.className=who==="Tú"?"user":"bot";
+div.innerHTML=`<b>${who}:</b> ${msg}`;
+chatBox.appendChild(div);
+chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+async function clearChat(){
+await fetch("/clear");
+history.innerHTML="";
+chatBox.innerHTML="";
+}
+
+/* ENTER */
+input.addEventListener("keydown",e=>{
+if(e.key==="Enter"&&!e.shiftKey){
+e.preventDefault();
+form.dispatchEvent(new Event("submit"));
+}
+});
+
