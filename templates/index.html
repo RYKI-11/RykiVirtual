@@ -1,47 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Ryki Virtual</title>
-    <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<title>Ryki Virtual</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
-<!-- HEADER -->
-<header class="top">
-    <img src="/static/avatar.png" class="avatar">
+<header>
+    <img src="/static/avatar.png">
     <h1>Ryki Virtual</h1>
 </header>
 
-<!-- CONTENEDOR -->
-<div class="container">
+<div class="main">
 
-    <!-- HISTORIAL -->
-    <aside class="sidebar">
-        <h3>Conversaciones</h3>
-        <ul id="history"></ul>
-        <button onclick="clearChat()">Borrar chat</button>
-    </aside>
+<div class="sidebar">
+    <h3>Historial</h3>
+    <ul id="history"></ul>
+    <button onclick="clearChat()"> Borrar chats</button>
+</div>
 
-    <!-- CHAT -->
-    <main class="chat">
+<div class="chat">
 
-        <!-- MENSAJES -->
-        <div id="chat-box" class="chat-box"></div>
+    <div id="chat-box"></div>
 
-        <!-- FORM -->
-        <form id="chat-form">
-            <input 
-                type="text" 
-                id="message-input" 
-                placeholder="Escribe tu mensaje..."
-                autocomplete="off"
-                required
-            >
-            <button type="submit">Enviar</button>
-        </form>
+    <form id="chat-form">
+        <textarea id="msg" placeholder="Escribe aquí..."></textarea>
+        <button type="submit">Enviar</button>
+    </form>
 
-    </main>
+</div>
+
 </div>
 
 <script src="/static/script.js"></script>
