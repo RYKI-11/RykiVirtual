@@ -1,52 +1,89 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
 import wikipedia
 from ddgs import DDGS
-import random
+import sqlite3
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
 
-wikipedia.set_lang("es")
+@app.get("/")
+def home():
+    return FileResponse("index.html")
 
-respuestas = [
- "Interesante",
- "Cuéntame más",
- "Eso suena bien",
- "Entiendo",
- "Vaya",
- "Genial!"
-]
+# --------- BASE DE DATOS ---------
+con=sqlite3.connect("memory.db",check_same_thread=False)
+cur=con.cursor()
+cur.execute("""
+CREATE TABLE IF NOT EXISTS chat(
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+user TEXT,
+bot TEXT
+)
+""")
+con.commit()
 
-def es_pregunta(texto):
-    palabras = ["quien","qué","cuando","donde","por que","cómo","cuál"]
-    return texto.endswith("?") or any(p in texto for p in palabras)
+def save(u,b):
+    cur.execute("INSERT INTO chat VALUES(NULL,?,?)",(u,b))
+    con.commit()
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+def load():
+    cur.execute("SELECT user,bot FROM chat")
+    return cur.fetchall()
+
+# --------- CHAT ---------
+
+class Chat(BaseModel):
+    message:str
+
+def wiki(q):
+    try:
+        wikipedia.set_lang("es")
+        return wikipedia.summary(q,2)
+    except:
+        return None
+
+def ddg(q):
+    try:
+        with DDGS() as d:
+            r=list(d.text(q,max_results=1))
+            return r[0]["body"] if r else None
+    except:
+        return None
 
 @app.post("/chat")
-async def chat(data: dict):
+def chat(data:Chat):
 
-    msg = data.get("message","").lower()
+    q=data.message.lower()
 
-    # SI ES PREGUNTA → BUSCAR
-    if es_pregunta(msg):
-        try:
-            reply = wikipedia.summary(msg, sentences=2)
-        except:
-            with DDGS() as ddgs:
-                r = list(ddgs.text(msg,max_results=1))
-                reply = r[0]["body"] if r else "No encontré información"
+    base={
+    "hola":"Hola soy Ryki ",
+    "como estas":"Muy bien ",
+    "quien eres":"Soy Ryki Virtual",
+    "adios":"Hasta luego "
+    }
 
-    # SI NO → RESPUESTA NORMAL
+    if q in base:
+        r=base[q]
     else:
-        reply = random.choice(respuestas)
+        r=wiki(q)
+        if not r:
+            r=ddg(q)
+        if not r:
+            r="No encontré información "
 
-    return {"reply":reply}
+    save(q,r)
+    return {"reply":r}
 
+@app.get("/memory")
+def memory():
+    return load()
+
+@app.get("/clear")
+def clear():
+    cur.execute("DELETE FROM chat")
+    con.commit()
+    return {"ok":True}
