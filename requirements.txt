@@ -1,8 +1,8 @@
 fastapi
 uvicorn
-jinja2
 wikipedia
 ddgs
 python-multipart
+
 
 
